@@ -169,5 +169,8 @@ dependencies:
   - zipp=0.6.0=py_0
   - zlib=1.2.11=h0b31af3_1006
   - zstd=1.4.0=ha9f0a20_0
+  - pip:
+    - -e .
 prefix: /Users/brentsair/anaconda3/envs/oy-env
+
 
