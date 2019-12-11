@@ -1,3 +1,13 @@
+/*
+    Author:     Wyatt Sharber & Brent Butler
+    Purpose:    Create a table of stats on "Opportunity Youth" in S. King county
+                from Census Data
+    Date:       November 4, 2019
+*/
+
+
+-- Create a table containing data on all youth in S. King County as 
+-- defined by the selected puma numbers
 DROP TABLE IF EXISTS total_youth;
 CREATE TABLE total_youth AS (
     SELECT * 
@@ -7,6 +17,8 @@ CREATE TABLE total_youth AS (
     AND (agep BETWEEN 16 AND 24) 
 );
 
+--Create a table containing only Opportunity youth as defined by not being in school
+-- and not working from S. King County as above
 DROP TABLE IF EXISTS oyyouth_from_pumas;
 CREATE TABLE oyyouth_from_pumas AS (
     SELECT * 
@@ -18,6 +30,7 @@ CREATE TABLE oyyouth_from_pumas AS (
     AND (esr = '3' OR esr = '6')
 );
 
+-- Find the age demographics of OY, Working w/out diploma, and not OY 
 DROP TABLE IF EXISTS oy_age_counts;
 
 CREATE TABLE oy_age_counts AS (
@@ -41,7 +54,7 @@ CREATE TABLE oy_age_counts AS (
 );
 
 DROP TABLE IF EXISTS oy_age_counts_by_education;
-
+-- Find OY by their education level 
 CREATE TABLE oy_age_counts_by_education AS (
     SELECT age_flag, edu_flag, SUM(pwgtp) as estimate, SUM(SUM(pwgtp)) OVER(PARTITION BY age_flag) AS total, ROUND((SUM(pwgtp) / SUM(SUM(pwgtp)) OVER(PARTITION BY age_flag)) * 100, 2) AS percent
     FROM (
@@ -64,14 +77,14 @@ CREATE TABLE oy_age_counts_by_education AS (
         ) AS temp
     GROUP BY age_flag, edu_flag
 );
-
+-- Calculate percent and total OY by age group
 DROP TABLE IF EXISTS oy_age_summary;
 CREATE TABLE oy_age_summary AS (
     SELECT oy_flag, SUM(estimate) AS Group_Total, SUM(SUM(estimate)) OVER () AS Total_Population, ROUND(SUM(estimate) / SUM(SUM(estimate)) OVER() * 100, 2) AS percent 
     FROM oy_age_counts
     GROUP BY oy_flag
 );
-
+-- Calculate percent and total OY by education completed
 DROP TABLE IF EXISTS oy_education_summary;
 CREATE TABLE oy_education_summary AS (
     SELECT edu_flag, SUM(estimate) AS Group_Total, SUM(SUM(estimate)) OVER () AS Total_Population, ROUND(SUM(estimate) / SUM(SUM(estimate)) OVER() * 100, 2) AS percent 
